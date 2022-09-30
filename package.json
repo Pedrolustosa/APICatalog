@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "commitizen": "^4.2.5",
+    "global": "^4.4.0"
+  }
+}
