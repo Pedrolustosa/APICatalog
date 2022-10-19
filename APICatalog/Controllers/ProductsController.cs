@@ -25,5 +25,18 @@ namespace APICatalog.Controllers
             }
             return products;
         }
+
+        [HttpGet]
+        [Route("{id}")]
+        public ActionResult<Product> GetById(int id)
+        {
+            var product = _context.Products?.FirstOrDefault(x => x.ProductId == id);
+
+            if(product == null)
+            {
+                return NotFound("Not Exist this Product");
+            }
+            return product;
+        }
     }
 }
