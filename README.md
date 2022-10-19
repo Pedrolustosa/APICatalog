@@ -43,5 +43,7 @@ In the update to .NET 6, two new sections were included presenting the new featu
 </details>
 
 Course: https://www.udemy.com/course/curso-web-api-asp-net-core-essencial/
+<br>
 Master: Macoratti
+<br>
 Site: https://www.macoratti.net/
