@@ -9,6 +9,7 @@
         public string? ImageURL { get; set; }
         public float Inventory { get; set; }
         public DateTime CreationDate { get; set; }
-
+        public int CategoryId { get; set; }
+        public Category? Category { get; set; }
     }
 }
