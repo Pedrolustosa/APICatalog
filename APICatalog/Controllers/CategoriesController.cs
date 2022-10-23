@@ -16,10 +16,10 @@ namespace APICatalog.Controllers
             _context = context;
         }
 
-        [HttpGet("produtos")]
+        [HttpGet("products")]
         public ActionResult<IEnumerable<Category>> GetCategoryWithProducts()
         {
-            return _context.Categories.Include(p => p.Products).ToList();
+            return _context.Categories.Include(p => p.Products).Where(c => c.CategoryId <= 5).ToList();
         }
 
         [HttpGet]
