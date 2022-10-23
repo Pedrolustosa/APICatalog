@@ -25,70 +25,105 @@ namespace APICatalog.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Category>> Get()
         {
-            var categories = _context.Categories?.ToList();
-            if (categories is null)
+            try
             {
-                return NotFound("Haven't categories");
+                return _context.Categories.AsNoTracking().ToList();
+
             }
-            return categories;
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
 
         [HttpGet]
         [Route("{id}", Name = "NewCategory")]
         public ActionResult<Category> GetById(int categoryId)
         {
-            var category = _context.Categories?.FirstOrDefault(x => x.CategoryId == categoryId);
-
-            if (category == null)
+            try
             {
-                return NotFound("Not Exist this Category");
+                var category = _context.Categories?.FirstOrDefault(x => x.CategoryId == categoryId);
+
+                if (category == null)
+                {
+                    return NotFound("Not Exist this Category");
+                }
+                return category;
             }
-            return category;
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+
+
         }
 
         [HttpPost]
         public ActionResult Post(Category category)
         {
-            if (category == null)
-                return BadRequest();
+            try
+            {
+                if (category == null)
+                    return BadRequest();
 
-            _context.Categories?.Add(category);
-            _context.SaveChanges();
+                _context.Categories?.Add(category);
+                _context.SaveChanges();
 
-            return new CreatedAtRouteResult("NewCategory", new { id = category.CategoryId }, category);
+                return new CreatedAtRouteResult("NewCategory", new { id = category.CategoryId }, category);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+            
         }
 
         [HttpPut]
         [Route("{categoryId}")]
         public ActionResult Put(int categoryId, Category category)
         {
-            if (categoryId != category.CategoryId)
+            try
             {
-                return BadRequest();
+                if (categoryId != category.CategoryId)
+                {
+                    return BadRequest();
+                }
+
+                _context.Entry(category).State = EntityState.Modified;
+                _context.SaveChanges();
+
+                return Ok(category);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
 
-            _context.Entry(category).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return Ok(category);
         }
 
         [HttpDelete]
         [Route("categoryId")]
         public ActionResult Remove(int categoryId)
         {
-            var category = _context.Categories?.FirstOrDefault(p => p.CategoryId == categoryId);
 
-
-            if (category is null)
+            try
             {
-                return NotFound("Not exist this Category!");
+                var category = _context.Categories?.FirstOrDefault(p => p.CategoryId == categoryId);
+
+                if (category is null)
+                {
+                    return NotFound("Not exist this Category!");
+                }
+
+                _context.Categories?.Remove(category);
+                _context.SaveChanges();
+
+                return Ok(category);
             }
-
-            _context.Categories?.Remove(category);
-            _context.SaveChanges();
-
-            return Ok(category);
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
     }
 }

@@ -19,70 +19,109 @@ namespace APICatalog.Controllers
         [HttpGet]
         public ActionResult<IEnumerable<Product>> Get()
         {
-            var products = _context.Products?.ToList();
-            if(products is null)
+
+            try
             {
-                return NotFound("Haven't Products");
+                var products = _context.Products?.ToList();
+                if (products is null)
+                {
+                    return NotFound("Haven't Products");
+                }
+                return products;
             }
-            return products;
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
         }
 
         [HttpGet]
         [Route("{id}", Name = "NewProduct")]
         public ActionResult<Product> GetById(int id)
         {
-            var product = _context.Products?.FirstOrDefault(x => x.ProductId == id);
-
-            if(product == null)
+            try
             {
-                return NotFound("Not Exist this Product");
+                var product = _context.Products?.FirstOrDefault(x => x.ProductId == id);
+
+                if (product == null)
+                {
+                    return NotFound("Not Exist this Product");
+                }
+                return product;
             }
-            return product;
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+
         }
 
         [HttpPost]
         public ActionResult Post(Product product)
         {
-            if (product == null)
-                return BadRequest();
+            try
+            {
+                if (product == null)
+                    return BadRequest();
 
-            _context.Products?.Add(product);
-            _context.SaveChanges();
+                _context.Products?.Add(product);
+                _context.SaveChanges();
 
-            return new CreatedAtRouteResult("NewProduct", new { id = product.ProductId }, product);
+                return new CreatedAtRouteResult("NewProduct", new { id = product.ProductId }, product);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
+            }
+
         }
 
         [HttpPut]
         [Route("{productId}")]
         public ActionResult Put(int productId, Product product)
         {
-            if (productId != product.ProductId)
+            try
             {
-                return BadRequest();
+                if (productId != product.ProductId)
+                {
+                    return BadRequest();
+                }
+
+                _context.Entry(product).State = EntityState.Modified;
+                _context.SaveChanges();
+
+                return Ok(product);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
 
-            _context.Entry(product).State = EntityState.Modified;
-            _context.SaveChanges();
-
-            return Ok(product);
         }
 
         [HttpDelete]
         [Route("productId")]
         public ActionResult Remove(int id)
         {
-            var product = _context.Products?.FirstOrDefault(p => p.ProductId == id);
-
-
-            if (product is null)
+            try
             {
-                return NotFound("Not exist this Product!");
+                var product = _context.Products?.FirstOrDefault(p => p.ProductId == id);
+
+                if (product is null)
+                {
+                    return NotFound("Not exist this Product!");
+                }
+
+                _context.Products?.Remove(product);
+                _context.SaveChanges();
+
+                return Ok(product);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
 
-            _context.Products?.Remove(product);
-            _context.SaveChanges();
-
-            return Ok(product);
         }
     }
 }
