@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 namespace APICatalog.Models
 {
@@ -35,8 +36,7 @@ namespace APICatalog.Models
 
         public int CategoryId { get; set; }
 
-        [Required]
-        [Display(Name = "Categoria")]
+        [JsonIgnore]
         public Category? Category { get; set; }
     }
 }
