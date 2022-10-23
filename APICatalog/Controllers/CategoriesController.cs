@@ -7,27 +7,28 @@ namespace APICatalog.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    public class ProductsController : ControllerBase
+    public class CategoriesController : ControllerBase
     {
         private readonly AppDbContext _context;
 
-        public ProductsController(AppDbContext context)
+        public CategoriesController(AppDbContext context)
         {
             _context = context;
         }
 
-        [HttpGet]
-        public ActionResult<IEnumerable<Product>> Get()
+        [HttpGet("products")]
+        public ActionResult<IEnumerable<Category>> GetCategoryWithProducts()
         {
+            return _context.Categories.Include(p => p.Products).Where(c => c.CategoryId <= 5).ToList();
+        }
 
+        [HttpGet]
+        public ActionResult<IEnumerable<Category>> Get()
+        {
             try
             {
-                var products = _context.Products?.ToList();
-                if (products is null)
-                {
-                    return NotFound("Haven't Products");
-                }
-                return products;
+                return _context.Categories.AsNoTracking().ToList();
+
             }
             catch (Exception e)
             {
@@ -36,61 +37,62 @@ namespace APICatalog.Controllers
         }
 
         [HttpGet]
-        [Route("{id}", Name = "NewProduct")]
-        public ActionResult<Product> GetById(int id)
+        [Route("{id}", Name = "NewCategory")]
+        public ActionResult<Category> GetById(int categoryId)
         {
             try
             {
-                var product = _context.Products?.FirstOrDefault(x => x.ProductId == id);
+                var category = _context.Categories?.FirstOrDefault(x => x.CategoryId == categoryId);
 
-                if (product == null)
+                if (category == null)
                 {
-                    return NotFound("Not Exist this Product");
+                    return NotFound("Not Exist this Category");
                 }
-                return product;
+                return category;
             }
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
+
 
         }
 
         [HttpPost]
-        public ActionResult Post(Product product)
+        public ActionResult Post(Category category)
         {
             try
             {
-                if (product == null)
+                if (category == null)
                     return BadRequest();
 
-                _context.Products?.Add(product);
+                _context.Categories?.Add(category);
                 _context.SaveChanges();
 
-                return new CreatedAtRouteResult("NewProduct", new { id = product.ProductId }, product);
+                return new CreatedAtRouteResult("NewCategory", new { id = category.CategoryId }, category);
             }
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
-
+            
         }
 
         [HttpPut]
-        [Route("{productId}")]
-        public ActionResult Put(int productId, Product product)
+        [Route("{categoryId}")]
+        public ActionResult Put(int categoryId, Category category)
         {
             try
             {
-                if (productId != product.ProductId)
+                if (categoryId != category.CategoryId)
                 {
                     return BadRequest();
                 }
 
-                _context.Entry(product).State = EntityState.Modified;
+                _context.Entry(category).State = EntityState.Modified;
                 _context.SaveChanges();
 
-                return Ok(product);
+                return Ok(category);
             }
             catch (Exception e)
             {
@@ -100,28 +102,28 @@ namespace APICatalog.Controllers
         }
 
         [HttpDelete]
-        [Route("productId")]
-        public ActionResult Remove(int id)
+        [Route("categoryId")]
+        public ActionResult Remove(int categoryId)
         {
+
             try
             {
-                var product = _context.Products?.FirstOrDefault(p => p.ProductId == id);
+                var category = _context.Categories?.FirstOrDefault(p => p.CategoryId == categoryId);
 
-                if (product is null)
+                if (category is null)
                 {
-                    return NotFound("Not exist this Product!");
+                    return NotFound("Not exist this Category!");
                 }
 
-                _context.Products?.Remove(product);
+                _context.Categories?.Remove(category);
                 _context.SaveChanges();
 
-                return Ok(product);
+                return Ok(category);
             }
             catch (Exception e)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, e.Message);
             }
-
         }
     }
 }
